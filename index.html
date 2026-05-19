@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choice Cart - Verified Premium Deals</title>
+    <style>
+        /* =========================================================
+           1. CSS VARIABLES & THEME SETUP
+           ========================================================= */
+        :root {
+            --bg-black: #050505;
+            --bg-deep-blue: #0b132b;
+            --bg-card: #1c2541;
+            --btn-green: #00E676;
+            --btn-green-hover: #00C853;
+            --text-white: #ffffff;
+            --text-blue: #48CAE4;
+            --text-ivory: #FFFFF0;
+            /* Carousel Hack Variables */
+            --carousel-height: 580px;
+            --card-slot-width: 350px; /* Width of card + gap */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-deep-blue) 0%, var(--bg-black) 100%);
+            color: var(--text-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, var(--text-white), var(--text-ivory), var(--text-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        /* =========================================================
+           2. HEADER & TRUST BADGE
+           ========================================================= */
+        header {
+            padding: 70px 20px 30px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+            header h1 {
+                font-size: 3.5rem;
+                font-weight: 800;
+                margin-bottom: 15px;
+                animation: fadeDown 1s ease-out;
+            }
+
+        .trust-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: inline-block;
+            background: rgba(72, 202, 228, 0.1);
+            border: 1px solid var(--text-blue);
+            color: var(--text-blue);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            animation: fadeDown 1s ease-out 0.2s both;
+            z-index: 100;
+        }
+
+        header p.subtitle {
+            font-size: 1rem;
+            color: var(--text-ivory);
+            opacity: 0.5;
+            max-width: 650px;
+            margin: 0 auto;
+            line-height: 1.5;
+            animation: fadeUp 1s ease-out 0.4s both;
+        }
+
+        /* =========================================================
+           3. DESKTOP MATRIX ROTATION SCROLL HACK
+           ========================================================= */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .scroll-indicator {
+            text-align: right;
+            color: var(--text-blue);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            opacity: 0.8;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .carousel-wrapper {
+            container-type: inline-size;
+            width: 100%;
+            height: var(--carousel-height);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .carousel-track {
+            position: absolute;
+            top: var(--carousel-height);
+            left: 0;
+            width: var(--carousel-height);
+            height: 100vw; /* Fallback for older browsers */
+            height: 100cqw; /* Exact container width for modern browsers */
+            /* The Magic: Rotate container so vertical scroll acts horizontal */
+            transform-origin: top left;
+            transform: rotate(-90deg);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-snap-type: y mandatory;
+            display: flex;
+            flex-direction: column;
+            scrollbar-width: thin;
+            scrollbar-color: var(--text-blue) rgba(28, 37, 65, 0.5);
+        }
+
+            .carousel-track::-webkit-scrollbar {
+                width: 12px;
+            }
+
+            .carousel-track::-webkit-scrollbar-track {
+                background: rgba(28, 37, 65, 0.5);
+                border-radius: 10px;
+            }
+
+            .carousel-track::-webkit-scrollbar-thumb {
+                background: rgba(72, 202, 228, 0.3);
+                border-radius: 10px;
+            }
+
+            .carousel-track:hover::-webkit-scrollbar-thumb {
+                background: var(--text-blue);
+            }
+
+        .card-wrapper {
+            flex: 0 0 var(--card-slot-width);
+            width: var(--carousel-height);
+            height: var(--card-slot-width);
+            position: relative;
+            scroll-snap-align: start;
+        }
+
+        .card-rotater {
+            position: absolute;
+            top: 0;
+            left: var(--carousel-height);
+            width: var(--card-slot-width);
+            height: var(--carousel-height);
+            /* The Magic: Rotate cards back upright */
+            transform-origin: top left;
+            transform: rotate(90deg);
+            padding: 20px 15px; /* Centers card and gives breathing room */
+            display: flex;
+            justify-content: center;
+        }
+
+        /* =========================================================
+           4. PRODUCT CARDS
+           ========================================================= */
+        .card {
+            width: 320px;
+            height: 100%;
+            background: rgba(28, 37, 65, 0.6);
+            border: 1px solid rgba(72, 202, 228, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(72, 202, 228, 0.2);
+            }
+
+        .product-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            background-color: var(--bg-black);
+        }
+
+        .product-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: var(--text-white);
+            flex-grow: 1; /* Pushes price and button to bottom */
+        }
+
+        .product-price {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--text-blue);
+            margin-bottom: 15px;
+        }
+
+        /* =========================================================
+           5. BUTTONS & FOOTER
+           ========================================================= */
+        .btn-buy {
+            display: inline-block;
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--btn-green);
+            color: #000000;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 8px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+            .btn-buy:hover {
+                background: var(--btn-green-hover);
+                transform: scale(1.03);
+                animation-play-state: paused;
+            }
+
+        footer {
+            background: rgba(0, 0, 0, 0.5);
+            border-top: 1px solid rgba(72, 202, 228, 0.1);
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+            .footer-content h3 {
+                color: var(--text-white);
+                margin-bottom: 15px;
+            }
+
+            .footer-content p {
+                color: var(--text-ivory);
+                opacity: 0.7;
+                font-size: 0.95rem;
+                margin-bottom: 10px;
+            }
+
+        .disclaimer {
+            font-size: 0.85rem;
+            opacity: 0.5;
+            margin-top: 20px;
+        }
+
+        /* =========================================================
+           6. ANIMATIONS
+           ========================================================= */
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(0, 230, 118, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 230, 118, 0);
+            }
+        }
+
+        /* =========================================================
+           7. MOBILE OVERRIDE (Fixes touch swiping)
+           ========================================================= */
+        @media (max-width: 900px) {
+            .trust-badge {
+                font-size: 0.75rem;
+                padding: 4px 10px;
+                top: 15px;
+                right: 15px;
+            }
+
+            .scroll-indicator {
+                content: "Swipe ➔";
+            }
+
+            /* Remove the rotation hack for phones/tablets so swiping works normally */
+            .carousel-wrapper {
+                height: auto;
+                overflow: visible;
+            }
+
+            .carousel-track {
+                position: relative;
+                top: 0;
+                width: 100%;
+                height: auto;
+                transform: none; /* Disables rotation */
+                overflow-y: hidden;
+                overflow-x: auto; /* Restores normal horizontal scrolling */
+                flex-direction: row;
+                scroll-snap-type: x mandatory;
+                padding-bottom: 20px;
+            }
+
+            .card-wrapper {
+                flex: 0 0 300px; /* Slightly smaller cards on mobile */
+                width: 300px;
+                height: auto;
+            }
+
+            .card-rotater {
+                position: relative;
+                left: 0;
+                width: 100%;
+                height: auto;
+                transform: none; /* Disables rotation */
+                padding: 0 10px;
+            }
+
+            .card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <span class="trust-badge">✓ Verified Amazon Finds</span>
+
+    <header>
+        <h1 class="gradient-text">Choice Cart</h1>
+        <p style="color: #1dff7b95" class="subtitle">We manually hunt down and review the highest-rated premium products. Shop with 100% confidence through our secure links—checkout is handled directly by Amazon.</p>
+    </header>
+
+    <main class="container">
+
+        <div class="scroll-indicator">Scroll Or Swipe ➔</div>
+
+        <div class="carousel-wrapper">
+            <div class="carousel-track">
+
+                <!-- PRODUCT 1 -->
+                <div class="card-wrapper">
+                    <div class="card-rotater">
+                        <div class="card">
+                            <!-- 🖼️ REPLACE IMAGE URL HERE -->
+                            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80" alt="Premium Headphones" class="product-image">
+                            <h2 class="product-title">Noise-Cancelling Headphones</h2>
+                            <div class="product-price">$299</div>
+                            <!-- 🔗 REPLACE AFFILIATE LINK HERE -->
+                            <a href="YOUR_AFFILIATE_LINK_1" class="btn-buy" target="_blank">Check on Amazon</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCT 2 -->
+                <div class="card-wrapper">
+                    <div class="card-rotater">
+                        <div class="card">
+                            <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80" alt="Smart Watch" class="product-image">
+                            <h2 class="product-title">Minimalist Smartwatch</h2>
+                            <div class="product-price">$199</div>
+                            <a href="YOUR_AFFILIATE_LINK_2" class="btn-buy" target="_blank">Check on Amazon</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCT 3 -->
+                <div class="card-wrapper">
+                    <div class="card-rotater">
+                        <div class="card">
+                            <img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=600&q=80" alt="Mechanical Keyboard" class="product-image">
+                            <h2 class="product-title">Mechanical Keyboard</h2>
+                            <div class="product-price">$149</div>
+                            <a href="YOUR_AFFILIATE_LINK_3" class="btn-buy" target="_blank">Check on Amazon</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCT 4 -->
+                <div class="card-wrapper">
+                    <div class="card-rotater">
+                        <div class="card">
+                            <img src="https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=600&q=80" alt="Minimalist Backpack" class="product-image">
+                            <h2 class="product-title">Everyday Backpack</h2>
+                            <div class="product-price">$85</div>
+                            <a href="YOUR_AFFILIATE_LINK_4" class="btn-buy" target="_blank">Check on Amazon</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCT 5 -->
+                <div class="card-wrapper">
+                    <div class="card-rotater">
+                        <div class="card">
+                            <img src="https://images.unsplash.com/photo-1586208556488-842eb41267b1?w=600&q=80" alt="Wireless Charging Pad" class="product-image">
+                            <h2 class="product-title">Wireless Charging Pad</h2>
+                            <div class="product-price">$45</div>
+                            <a href="YOUR_AFFILIATE_LINK_5" class="btn-buy" target="_blank">Check on Amazon</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCT 6 -->
+                <div class="card-wrapper">
+                    <div class="card-rotater">
+                        <div class="card">
+                            <img src="https://images.unsplash.com/photo-1620601679095-21e10222f7cd?w=600&q=80" alt="Portable Power Bank" class="product-image">
+                            <h2 class="product-title">Ultra-Slim Power Bank</h2>
+                            <div class="product-price">$60</div>
+                            <a href="YOUR_AFFILIATE_LINK_6" class="btn-buy" target="_blank">Check on Amazon</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCT 7 -->
+                <div class="card-wrapper">
+                    <div class="card-rotater">
+                        <div class="card">
+                            <img src="https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&q=80" alt="Premium Earbuds" class="product-image">
+                            <h2 class="product-title">Premium Wireless Earbuds</h2>
+                            <div class="product-price">$120</div>
+                            <a href="YOUR_AFFILIATE_LINK_7" class="btn-buy" target="_blank">Check on Amazon</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCT 8 -->
+                <div class="card-wrapper">
+                    <div class="card-rotater">
+                        <div class="card">
+                            <img src="https://images.unsplash.com/photo-1615663245857-ac93bb9c3e23?w=600&q=80" alt="Ergonomic Mouse" class="product-image">
+                            <h2 class="product-title">Ergonomic Mouse</h2>
+                            <div class="product-price">$75</div>
+                            <a href="YOUR_AFFILIATE_LINK_8" class="btn-buy" target="_blank">Check on Amazon</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCT 9 -->
+                <div class="card-wrapper">
+                    <div class="card-rotater">
+                        <div class="card">
+                            <img src="https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=600&q=80" alt="Smart Desk Lamp" class="product-image">
+                            <h2 class="product-title">Smart LED Desk Lamp</h2>
+                            <div class="product-price">$55</div>
+                            <a href="YOUR_AFFILIATE_LINK_9" class="btn-buy" target="_blank">Check on Amazon</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCT 10 -->
+                <div class="card-wrapper">
+                    <div class="card-rotater">
+                        <div class="card">
+                            <img src="https://images.unsplash.com/photo-1557002621-1f9db40510be?w=600&q=80" alt="Travel Organizer" class="product-image">
+                            <h2 class="product-title">Tech Travel Organizer</h2>
+                            <div class="product-price">$35</div>
+                            <a href="YOUR_AFFILIATE_LINK_10" class="btn-buy" target="_blank">Check on Amazon</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <h3>🔒 Safe & Secure Shopping</h3>
+            <p>We do not process payments or collect your personal financial data. All transactions are handled securely via Amazon's encrypted checkout system.</p>
+            <p class="disclaimer"><strong>Affiliate Disclosure:</strong> Choice Cart is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com. This comes at absolutely no extra cost to you.</p>
+            <p class="disclaimer">&copy; 2026 Choice Cart. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
